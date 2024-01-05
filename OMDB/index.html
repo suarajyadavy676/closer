@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OMDB_API</title>
+  <style>
+    body{
+      margin: 0px; box-sizing: border-box; background-image: url(search.avif); background-size: cover; background-repeat: no-repeat;
+      color: white;
+    }
+    #container{
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; width: 80%; margin: 20px 5%; text-align: center;
+    }
+    .movie_card{
+      border: 2px solid black;
+    }
+    #search{
+      margin-left: 45%; margin-top: 5vh; background-color: rgb(243, 220, 203); height: 30px; text-align: center;
+    }
+    h1{
+      text-align: center; display: none;
+    }
+    @media screen and (max-width:360px){
+      #container{
+        grid-template-columns: repeat(2,1fr);
+      }
+      
+    }
+  </style>
+</head>
+<body>
+  <input type="text" id="search" placeholder="Search..." oninput="debounce(makeApiCall,1000)">
+  <h1 id="err">Movie is not found</h1>
+  <div id="container">
+
+
+  </div>
+</body>
+<script>
+  async function makeApiCall(){
+    let search = document.getElementById('search').value
+    try{
+      document.getElementById('search').style.marginTop = "5vh"
+      container.innerHTML = null
+      // console.log("hello",Date.now())
+      let res = await fetch(`https://www.omdbapi.com/?s=${search}&apikey=7f4ccb39`)
+      let data = (await res.json()).Search
+      // console.log(data)
+      displayData(data)
+    } catch(err){
+      if(search.length == 0){
+         return defaultFunc()
+      } else{
+        document.getElementById('err').style.display = "block"
+      }
+    }
+  }
+  let timeId
+  function debounce(func,delay){
+    let container = document.getElementById('container')
+    if(timeId){
+      clearInterval(timeId)
+    }
+    timeId = setTimeout(func,delay)
+  }
+
+  
+  function displayData(data){
+    (data).forEach(ele => {
+      console.log(ele)
+      let movieCard = document.createElement('div')
+      movieCard.className = 'movie_card'
+      let img = document.createElement('img')
+      img.src = ele.Poster
+      let title = document.createElement('p')
+      title.innerText = "Name : " + ele.Title
+      let year = document.createElement('p')
+      year.textContent = "Year : " + ele.Year
+      let type = document.createElement('p')
+      type.textContent = "Type : " + ele.Type
+      movieCard.append(img,title,year,type)
+      container.appendChild(movieCard)
+      
+    });
+  }
+
+
+   async function defaultFunc(){
+    try{
+      let res = await fetch(`https://www.omdbapi.com/?s=matrix&apikey=7f4ccb39`)
+      let data = (await res.json()).Search
+      defaultdisplayData(data)
+
+    }catch(err){
+
+    }
+  }
+  function defaultdisplayData(data){
+    (data).forEach(ele => {
+      console.log(ele)
+      let movieCard = document.createElement('div')
+      movieCard.className = 'movie_card'
+      let img = document.createElement('img')
+      img.src = ele.Poster
+      let title = document.createElement('p')
+      title.innerText = "Name : " + ele.Title
+      let year = document.createElement('p')
+      year.textContent = "Year : " + ele.Year
+      let type = document.createElement('p')
+      type.textContent = "Type : " + ele.Type
+      movieCard.append(img,title,year,type)
+      container.appendChild(movieCard)
+      
+    });
+    
+  }
+
+  defaultFunc()
+  
+</script>
+</html>
